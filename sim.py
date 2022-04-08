@@ -4,7 +4,7 @@ from clock import Clock
 from CPU import CPU
 from custom_queue import FCFS, SPN, FinishedQueue
 
-CPU_count = 4
+CPU_count = 15
 TIMEOUT = 5
 
 # List of process ready to be dispatched, dispatch based on the arrival time
@@ -164,14 +164,14 @@ for cpu in main_CPU:
 
 
 # output to csv file
-with open("output/process.csv", "w") as f:
+with open("output/process_15_cpu_5_timeout.csv", "w") as f:
     f.write("Process ID, throughput time, total wait time, number of context switch, total CPU time, total IO time\n")
     for process in finished_queue.get_queue():
         f.write(process.out_csv_line() + "\n")
 
 
 # output CPU stats to csv file
-with open("output/CPU.csv", "w") as f:
+with open("output/CPU_15_cpu_5_timeout.csv", "w") as f:
     f.write("CPU total busy time, CPU total idle time\n")
     for cpu in main_CPU:
         f.write(str(cpu.accumulated_busy_time) + ", " + str(cpu.accumulated_idle_time) + "\n")

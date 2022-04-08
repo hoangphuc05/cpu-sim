@@ -1,7 +1,7 @@
 import random
 lines = ""
 
-for i in range(1, 15):
+for i in range(1, 20):
     # add PID
     lines += str(i) + ","
     for n in range(1, random.randrange(1, 50)):
@@ -13,5 +13,5 @@ for i in range(1, 15):
     lines += "\n"
 
 # write to file
-with open("data_long.csv", "w") as f:
+with open("data/data_long.csv", "w") as f:
     f.write(lines)
