@@ -17,5 +17,10 @@ class PCB:
         self.finish_time = 0
 
     def __str__(self) -> str:
-        print("Wait time: " + str(self.accumulated_wait_time))
-        return "PID: {}, arrival_time: {},state: {}, CPU_time: {}, IO_time: {}, accumulated_CPU_time: {}, accumulated_IO_time: {}, remaining_task: {}".format(self.PID, self.arrival_time, self.state, self.CPU_time, self.IO_time, self.accumulated_CPU_time, self.accumulated_IO_time, self.remaining_task)
+        return "PID: {}, throughput time: {}, wait time: {}, context switching count: {}".format(self.PID, self.finish_time - self.arrival_time, self.accumulated_wait_time, self.accumulated_context_switch)
+    
+    def print(self) -> None:
+        print("PID: {}, throughput time: {}, wait time: {}, context switching count: {}".format(self.PID, self.finish_time - self.arrival_time, self.accumulated_wait_time, self.accumulated_context_switch))
+
+    def out_csv_line(self) -> str:
+        return "{},{},{},{},{},{}".format(self.PID, self.finish_time - self.arrival_time, self.accumulated_wait_time, self.accumulated_context_switch, self.accumulated_CPU_time, self.accumulated_IO_time)

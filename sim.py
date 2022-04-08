@@ -5,7 +5,7 @@ from CPU import CPU
 from custom_queue import FCFS, SPN, FinishedQueue
 
 CPU_count = 4
-TIMEOUT = 10
+TIMEOUT = 5
 
 # List of process ready to be dispatched, dispatch based on the arrival time
 dispatch_queue:List[PCB] = []
@@ -52,7 +52,7 @@ main_CPU = []
 for i in range(CPU_count):
     main_CPU.append(CPU())
 
-while clock.time < 150 or ready_queue.len() > 0 or len(IO_queue) > 0 or event_queue.len() > 0 or not is_cpu_idle(main_CPU):
+while clock.time < 15000 or ready_queue.len() > 0 or len(IO_queue) > 0 or event_queue.len() > 0 or not is_cpu_idle(main_CPU):
     #tick
     clock.tick()
 
@@ -67,7 +67,7 @@ while clock.time < 150 or ready_queue.len() > 0 or len(IO_queue) > 0 or event_qu
     # move process from event queue to fcfs queue
     if event_queue.len() > 0:
         FCFS_queue.append(event_queue.pop())
-    if ready_queue.len() > 0:
+    elif ready_queue.len() > 0:
         FCFS_queue.append(ready_queue.pop())
 
     # IO process
@@ -161,3 +161,17 @@ for process in finished_queue.get_queue():
 
 for cpu in main_CPU:
     print(cpu)
+
+
+# output to csv file
+with open("output/process.csv", "w") as f:
+    f.write("Process ID, throughput time, total wait time, number of context switch, total CPU time, total IO time\n")
+    for process in finished_queue.get_queue():
+        f.write(process.out_csv_line() + "\n")
+
+
+# output CPU stats to csv file
+with open("output/CPU.csv", "w") as f:
+    f.write("CPU total busy time, CPU total idle time\n")
+    for cpu in main_CPU:
+        f.write(str(cpu.accumulated_busy_time) + ", " + str(cpu.accumulated_idle_time) + "\n")
