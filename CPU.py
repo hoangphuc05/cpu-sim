@@ -13,3 +13,6 @@ class CPU:
             self.accumulated_idle_time += 1
         else:
             self.accumulated_busy_time += 1
+
+    def __str__(self) -> str:
+        return "CPU accumulated idle time: " + str(self.accumulated_idle_time) + ", CPU accumulated busy time: " + str(self.accumulated_busy_time) + "\n"

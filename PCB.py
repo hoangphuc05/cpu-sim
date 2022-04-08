@@ -14,6 +14,7 @@ class PCB:
         self.current_start_time = 0
 
         self.accumulated_wait_time = 0
+        self.finish_time = 0
 
     def __str__(self) -> str:
         print("Wait time: " + str(self.accumulated_wait_time))

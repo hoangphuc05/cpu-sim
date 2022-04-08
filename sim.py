@@ -2,9 +2,10 @@ from typing import List, Tuple
 from PCB import PCB
 from clock import Clock
 from CPU import CPU
-from custom_queue import FCFS, SPN
+from custom_queue import FCFS, SPN, FinishedQueue
 
 CPU_count = 4
+TIMEOUT = 10
 
 # List of process ready to be dispatched, dispatch based on the arrival time
 dispatch_queue:List[PCB] = []
@@ -21,7 +22,7 @@ event_queue = SPN()
 # IO queue, storing all process waiting for IO
 IO_queue:List[PCB] = []
 
-finished_queue:List[PCB] = []
+finished_queue = FinishedQueue()
 
 # function to read data from file
 def read_data(filename: str) -> List[PCB]:
@@ -40,7 +41,7 @@ def is_cpu_idle(CPU_list: List[CPU]) -> bool:
     return True
 
 # read data from file and add to dispatch queue
-dispatch_queue = read_data("data/data.csv")
+dispatch_queue = read_data("data/data_long.csv")
 process_count = len(dispatch_queue)
 
 # create clock
@@ -89,7 +90,7 @@ while clock.time < 150 or ready_queue.len() > 0 or len(IO_queue) > 0 or event_qu
                 event_queue.append(IO_queue[i])
             else:
                 IO_queue[i].state = "finished"
-                finished_queue.append(IO_queue[i])
+                finished_queue.append(IO_queue[i], clock)
 
         else:
             IO_queue[i].remaining_task[0] -= 1
@@ -128,10 +129,23 @@ while clock.time < 150 or ready_queue.len() > 0 or len(IO_queue) > 0 or event_qu
                     main_CPU[i].current_process = None
                 else:
                     main_CPU[i].current_process.state = "finished"
-                    finished_queue.append(main_CPU[i].current_process)
+                    finished_queue.append(main_CPU[i].current_process, clock)
                     main_CPU[i].current_process = None
             else:
-                main_CPU[i].current_process.remaining_task[0] -= 1
+                # check if process is timed out
+                if (clock.time - main_CPU[i].start_time) > TIMEOUT:
+                    main_CPU[i].state = "idle"
+                    main_CPU[i].current_process.CPU_time = clock.time - main_CPU[i].start_time
+                    main_CPU[i].current_process.accumulated_CPU_time += main_CPU[i].current_process.CPU_time
+
+                    # move the current task back to ready queue
+                    main_CPU[i].current_process.state = "waiting"
+                    main_CPU[i].current_process.accumulated_context_switch += 1
+                    ready_queue.append(main_CPU[i].current_process)
+                    main_CPU[i].current_process = None
+                else:
+                    main_CPU[i].current_process.remaining_task[0] -= 1
+
 
     # dispatch process
     to_delete = []
@@ -142,5 +156,8 @@ while clock.time < 150 or ready_queue.len() > 0 or len(IO_queue) > 0 or event_qu
 
 print("a")
 
-for process in finished_queue:
+for process in finished_queue.get_queue():
     print(process)
+
+for cpu in main_CPU:
+    print(cpu)

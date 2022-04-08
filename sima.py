@@ -41,7 +41,7 @@ def is_cpu_idle(CPU_list: List[CPU]) -> bool:
     return True
 
 # read data from file and add to dispatch queue
-dispatch_queue = read_data("data/data.csv")
+dispatch_queue = read_data("data/data_long.csv")
 process_count = len(dispatch_queue)
 
 # create clock
